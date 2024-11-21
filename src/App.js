@@ -6,15 +6,13 @@ import Signup from "./pages/signup/Signup";
 function App() {
   return (
     <div className="App">
-     <Header/>
+      <Header />
       <Routes>
-        <Route path="/" element={<Signup/>}/>
-        <Route path="/dashboard" element={<Dashboard/>}/>
+        <Route path="/" element={<Signup />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
-      
     </div>
-  )
+  );
 }
-
 
 export default App;

@@ -5,7 +5,7 @@
   font-size: 0.8rem;
   margin: 1rem 0;
   padding: 0.75rem !important;
-  background-color: #fff;
+  background-color: var(--white);
   border: 1px solid var(--theme);
   border-radius: 0.23rem;
   cursor: pointer;
@@ -17,9 +17,9 @@
 
 .btn:hover {
   background-color: var(--theme);
-  color: #fff;
+  color: var(--white);
   transition: all 0.2s;
-  border:1px solid var(--theme) ;
+  border: 1px solid var(--theme);
 }
 
 .btn-blue {

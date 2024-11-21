@@ -1,20 +1,18 @@
-import './header.css'
-import { Navigate } from 'react-router-dom';
+import "./header.css";
+import { Navigate } from "react-router-dom";
 
 const Header = () => {
-function logOut(){
-  // auth.signOut();
-  Navigate('/')
-}
-
+  function logOut() {
+    // auth.signOut();
+    Navigate("/");
+  }
 
   return (
-    <nav className='header'>
+    <nav className="header">
       <h1>Financy</h1>
-      <p className='link'>Logout</p>
-      
+      <p className="link">Logout</p>
     </nav>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

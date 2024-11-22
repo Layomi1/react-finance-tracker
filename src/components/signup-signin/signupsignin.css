@@ -29,3 +29,10 @@ span.link {
   color: rgba(148, 144, 144, 0.883);
   text-decoration: none;
 }
+
+p.login {
+  text-align: center;
+  margin: 0;
+  font-weight: 300;
+  font-size: 0.8rem;
+}

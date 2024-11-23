@@ -5,9 +5,11 @@ import { Button } from "../custom-button/Button";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithPopup,
 } from "firebase/auth";
 
-import { auth } from "../../firebase";
+import { auth, db, provider } from "../../firebase";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
@@ -30,7 +32,7 @@ const SignupSignin = () => {
     if (
       (name !== "" && email !== "", password !== "" && confirmPassword !== "")
     ) {
-      if (password == confirmPassword) {
+      if (password === confirmPassword) {
         createUserWithEmailAndPassword(auth, email, password)
           .then((userCredential) => {
             // Signed up
@@ -45,7 +47,7 @@ const SignupSignin = () => {
             navigate("/dashboard");
 
             // create a doc with user id as the following id
-            createdDoc(user);
+            createUserDocument(user);
           })
           .catch((error) => {
             // const errorCode = error.code;
@@ -62,18 +64,14 @@ const SignupSignin = () => {
       setLoading(false);
     }
   }
-  function createdDoc() {
-    // Make sure that the doc with the user id doesnot exist
-  }
 
   function loginUsingEmail() {
     console.log(email, "email");
     console.log(password, "password");
 
-    if ((email !== "", password !== "")) {
+    if (email !== "" && password !== "") {
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          // Signed in
           const user = userCredential.user;
           toast.success("User Login in!");
           setLoading(false);
@@ -81,7 +79,7 @@ const SignupSignin = () => {
           setPassword("");
         })
         .catch((error) => {
-          const errorCode = error.code;
+          // const errorCode = error.code;
           const errorMessage = error.message;
           toast.error(errorMessage);
           setLoading(false);
@@ -91,6 +89,70 @@ const SignupSignin = () => {
       setLoading(false);
     }
   }
+
+  async function createUserDocument(user) {
+    // Make sure that the doc with the user id doesnot exist
+    setLoading(true);
+
+    const userRef = doc(db, "users", user.uid);
+    const userData = await getDoc(userRef);
+
+    if (!userData.exists()) {
+      const createdAt = new Date();
+      const { displayName, email, photoURL } = user;
+
+      try {
+        await setDoc(userRef, {
+          name: displayName ? displayName : name,
+          email,
+          photoURL: photoURL ? photoURL : "",
+          createdAt,
+        });
+        toast.success("Doc created!");
+        setLoading(false);
+      } catch (error) {
+        const errorMessage = error.message;
+        toast.error(errorMessage);
+        setLoading(false);
+      }
+    } else {
+      toast.error("Doc already exists!");
+      setLoading(false);
+    }
+  }
+
+  // signup using Google
+  // const googleAuth = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const result = await signInWithPopup(auth, provider);
+  //     const user = result.user;
+  //     console.log(result);
+  //     await createUserDocument(user);
+
+  //     toast.success("User Authenticated Successfully!");
+  //     setLoading(false);
+  //   } catch (error) {
+  //     toast.error("Error signing with Google");
+  //     setLoading(false);
+  //   }
+  // };
+  const googleAuth = async () => {
+    setLoading(true);
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      await createUserDocument(user);
+      toast.success("User Authenticated Successfully!");
+      setLoading(false);
+      navigate("/dashboard");
+    } catch (error) {
+      setLoading(false);
+      toast.error(error.message);
+      console.error("Error signing in with Google: ", error.message);
+    }
+  };
+
   return (
     <>
       {loginForm ? (
@@ -124,6 +186,7 @@ const SignupSignin = () => {
               disabled={loading}
               text={loading ? "Loading ..." : "Login Using Google"}
               blue={true}
+              onClick={googleAuth}
             />
             <p
               className="login"
@@ -178,6 +241,7 @@ const SignupSignin = () => {
               disabled={loading}
               text={loading ? "Loading ..." : "Sign up Using Google"}
               blue={true}
+              onClick={googleAuth}
             />
             <p
               className="login"
